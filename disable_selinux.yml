@@ -1,0 +1,5 @@
+---
+- hosts: all
+  tasks:
+  - name: disable selinux
+    lineinfile: dest=/etc/selinux/config regexp=^SELINUX= line=SELINUX=disabled
