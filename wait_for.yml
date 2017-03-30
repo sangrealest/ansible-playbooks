@@ -1,0 +1,28 @@
+---
+- hosts: c6
+  remote_user: root
+  name: test wait for module
+  tasks:
+  - name: do some task and register a var
+    template:
+        src: "templates/index-ver1.html"
+        dest: "/var/www/html/index.html"
+    register: pageupgrade
+
+  - name: restart kvm machine
+    shell: sleep 1 && shutdown -r now
+    async: 1
+    poll: 0
+    ignore_errors: True
+    when: pageupgrade.changed
+
+  - name: waitting for server come back
+    wait_for:
+        host: c6 
+        port: 22
+        state: started 
+        delay: 20 
+        timeout: 200
+    become: False
+    delegate_to: 127.0.0.1
+    when: pageupgrade.changed
