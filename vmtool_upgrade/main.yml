@@ -1,0 +1,45 @@
+---
+- hosts: oracle_test
+  name: update vmware-tools
+  become: true
+  gather_facts: false
+  serial: "30%"
+  strategy: free
+
+  tasks:
+  - name: this is a vmware-tools update
+    shell: /usr/bin/vmware-config-tools.pl -d
+    notify:
+    - reboot sequence
+
+  handlers:
+
+  - name: reboot sequence
+    changed_when: true
+    debug: msg="trigger machine reboot sequence"
+    notify:
+    - get current time
+    - reboot system
+    - wait for server to come back
+    - verify a reboot was initiated
+    
+  - name: get current time
+    command: /bin/date +%s 
+    register: before_reboot
+    become: false
+
+  - name: reboot system
+    shell: sync;sync && reboot
+    async: 0
+    poll: 0
+    become: true
+    ignore_errors: true
+   
+  - name: wait for server to come back
+    local_action: wait_for host={{ inventory_hostname }} port=22 state=started delay=60 timeout=480
+    become: false
+
+  - name: verify a reboot was initiated
+    shell: ((`date +%s` - `awk -F . '{print $1}' /proc/uptime` > {{ before_reboot.stdout }}))
+    become: false 
+
