@@ -1,0 +1,21 @@
+- hosts: labs
+  gather_facts: true
+  strategy: debug
+  tasks:
+  - name: Create CSV log entry
+    set_fact:
+      csv_entry: "{{ ansible_date_time.date }}\t{{ ansible_fqdn }}\t{{ ansible_distribution }}\t{{ ansible_kernel }}\t{{ ansible_architecture }}\t{{ ansible_default_ipv4.address }}\t{{ansible_processor_cores }} cores\t{{ (ansible_memtotal_mb/1024)|round|int }}GB Mem\tuptime {{ (ansible_uptime_seconds/3600)|round|int }} H\t{{ ansible_mounts.0.mount }}\t{{ (ansible_mounts.0.size_available/1024/1024/1024)|round|int }}GB free"
+
+- hosts: labs
+  name: generate log file
+  serial: 1
+  tasks:
+  - name: Add or update changes to systems.csv
+    lineinfile:
+      line: '{{ csv_entry }}'
+#      regexp: ';{{ ansible_hostname }};'
+      dest: /tmp/systems.csv
+      state: present
+      create: yes
+    delegate_to: localhost
+
