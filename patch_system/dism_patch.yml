@@ -1,0 +1,45 @@
+---
+- hosts: win
+  name: path windows
+  tasks:
+  - name: Delete  bug_ix directory 
+    win_file: path=C:/bug_fix state=absent
+
+  - name: Create a bug_ix directory 
+    win_file: path=C:/bug_fix state=directory
+
+  - block:
+    - name: copy patch to reomte 2008 servers
+      win_copy: src=fix_2k8.zip dest=C:/ 
+      tags: 
+      - 2008
+      - copy_patch
+  
+    - name: unzip files in 2k8
+      win_unzip: src=C:/fix_2k8.zip dest=C:/bug_fix rm=true
+      tags: 
+      - 2008
+      - unzip_patch
+
+    when: ansible_os_name == "Microsoft Windows Server 2008 R2 Standard"
+
+  - block:
+    - name: copy patch to reomte 2012 servers
+      win_copy: src=fix_2k12.zip dest=C:/
+      tags: 
+      - 2012
+      - copy_patch
+  
+    - name: unzip files in 2k12
+      win_unzip: src=C:/fix_2k12.zip dest=C:/bug_fix rm=true
+      tags: 
+      - 2012
+      - unzip_patch
+
+    when: ansible_os_name == "Microsoft Windows Server 2012 R2 Standard"
+
+  - name: path the system
+    win_shell: dism /online /add-package /norestart /packagepath:C:/bug_fix
+    failed_when: false
+    tags:
+    - patch 

@@ -1,0 +1,17 @@
+---
+- hosts: all
+  name: upgrade windows patches
+  vars: 
+  - package: KB2553549
+  tasks:
+  - name: get systeminfo
+    win_shell: systeminfo
+    register: systeminfo_result
+  
+  - block:
+    - name: copy windows update to remote server
+      win_copy: dest=D:\{{ package }}-x64.msu src=windows
+
+    - name: install KB2553549 if not installed
+      win_shell: wusa.exe D:\{{ package }}-x64.msu /quiet /norestart
+    when: systeminfo_result.stdout.find('KB2553549') == -1
