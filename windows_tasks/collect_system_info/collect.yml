@@ -1,0 +1,23 @@
+- hosts: win
+  gather_facts: true
+  tasks:
+  - name: Test system connection
+    wait_for_connection:
+      timeout: 20
+
+  - name: Create CSV log entry
+    set_fact:
+      csv_entry: "{{ ansible_date_time.date }}\t{{ ansible_fqdn }}\t{{ ansible_os_name }}\t{{ ansible_distribution_version }}\t{{ ansible_architecture }}\t{{ ansible_ip_addresses[0] }}\t{{ansible_processor_count }} cores\t{{ (ansible_memtotal_mb/1024)|round|int }}GB\t{{ ansible_system_vendor }}\t\tlast boot{{ ansible_lastboot }}\t"
+
+- hosts: win
+  serial: 1
+  tasks:
+  - name: Add or update changes to systems.csv
+    lineinfile:
+      line: '{{ csv_entry }}'
+      regexp: ';{{ ansible_hostname }};'
+      dest: /tmp/systems.csv
+      state: present
+      create: yes
+    delegate_to: localhost
+
