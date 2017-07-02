@@ -1,0 +1,13 @@
+---
+- hosts: win
+  name: delete specific log files
+  vars:
+    log_path: "C:/rdcman.msi"
+  tasks:
+#  - name: stat file info whether is exist
+#    win_stat: path={{ log_path }}
+#    register: path_info
+
+  - name: delete logs
+    win_file: path={{ log_path }} state=absent
+#    when: path_info.stat.exists
