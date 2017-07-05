@@ -1,0 +1,16 @@
+---
+- hosts: win
+  gather_facts: false
+  vars_prompt:
+  - name: "process_name"
+    prompt: 'What is your process name that you want to search'
+    private: false
+    default: 'powershell'
+
+  tasks:
+  - name: get task info
+    win_shell: tasklist | findstr {{ process_name }}
+    ignore_errors: true
+    register: taskinfo 
+
+  - debug: msg={{ taskinfo.stdout_lines}}
