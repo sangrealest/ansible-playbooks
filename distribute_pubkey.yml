@@ -1,0 +1,9 @@
+---
+- hosts: all
+  name: Use ansible to get ssh pub authorized
+  vars:
+    user: root
+    pub_key: /root/.ssh/id_rsa.pub
+  tasks:
+  - name: deploy ssh pub key
+    authorized_key: user={{ user }} key="{{ lookup('file', '{{ pub_key }}') }}" state=present
