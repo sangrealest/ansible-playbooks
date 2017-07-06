@@ -1,0 +1,16 @@
+---
+- hosts: win
+  gather_facts: false
+  vars_prompt:
+  - name: "port_number"
+    prompt: 'What is your port number that you want to search'
+    private: false
+    default: '5986'
+
+  tasks:
+  - name: get task info
+    win_shell: netstat -ant | findstr {{ port_number }}
+    ignore_errors: true
+    register: portinfo 
+
+  - debug: msg={{ portinfo.stdout_lines}}

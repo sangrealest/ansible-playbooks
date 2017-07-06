@@ -1,0 +1,16 @@
+---
+- hosts: win
+  gather_facts: false
+  vars_prompt:
+  - name: "service_name"
+    prompt: 'What is your service name that you want to search'
+    private: false
+    default: 'WinRM'
+
+  tasks:
+  - name: get service info
+    win_shell: get-service | findstr {{ service_name }}
+    failed_when: false
+    register: serviceinfo 
+
+  - debug: msg={{ serviceinfo.stdout_lines}}

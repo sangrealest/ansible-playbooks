@@ -1,0 +1,6 @@
+---
+- hosts: win
+  name: get system information
+  tasks:
+  - name: get operation name
+    debug: msg='The Operation name is "{{ansible_os_name}}"'

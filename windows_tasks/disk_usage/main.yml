@@ -1,0 +1,8 @@
+---
+- hosts: win
+  gather_facts: False
+  tasks:
+  - name: get C drive disk usage info
+    script: disk_usage.ps1
+    register: info
+  - debug: msg="the C drive disk usage  {{info.stdout_lines[7]}}"

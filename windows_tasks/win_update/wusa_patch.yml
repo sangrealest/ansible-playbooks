@@ -1,0 +1,8 @@
+---
+- hosts: 10.199.207.113
+  name: path windows
+  tasks:
+  - name: copy patch to reomte servers
+    win_copy: src=winupdate.msu dest=c:\
+  - name: path the system
+    win_shell: wusa.exe /quiet /norestart /log C:/winupdate.msu

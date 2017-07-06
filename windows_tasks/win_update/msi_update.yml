@@ -1,0 +1,11 @@
+---
+- hosts: win
+  name: use win_msi module to update
+  vars:
+    software: 7z920-x64.msi
+  tasks: 
+  - name: copy update to reomte servers
+    win_copy: src={{ item }} dest=C:/{{ item }}
+    with_items:
+    - "{{ software }}"
+  - win_msi: path=C:/{{ software }} state=present

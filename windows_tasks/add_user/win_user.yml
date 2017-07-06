@@ -1,0 +1,9 @@
+---
+- hosts: win2008
+  name: add user
+  tasks:
+  - name: create user
+    win_user: name=ansible groups=administrators groups_action=add password="passwd_here" password_never_expires=yes user_cannot_change_password=yes
+
+#  - name: delete a user
+#    win_user: name={{user}} state=absent

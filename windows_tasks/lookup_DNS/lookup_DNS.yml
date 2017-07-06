@@ -1,0 +1,9 @@
+---
+- hosts: win
+  name: DNS lookup
+  tasks:
+  - name: get DNS info
+    script: dns.ps1
+    register: dnsinfo 
+
+  - debug: msg={{ dnsinfo.stdout_lines[3:5]}}

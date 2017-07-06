@@ -1,0 +1,16 @@
+---
+- hosts: win
+  gather_facts: false
+  vars_prompt:
+  - name: "kb_number"
+    prompt: 'What is your KB number that you want to search'
+    private: false
+    default: 'KB4012214'
+
+  tasks:
+  - name: get task info
+    win_shell: get-hotfix | findstr {{ kb_number }}
+    ignore_errors: true
+    register: fix_info 
+
+  - debug: msg={{ fix_info.stdout_lines }}
