@@ -1,6 +1,0 @@
----
-ntp_timezone: ""
-ntp_servers:
-  - yourserver0.ntp.org
-  - yourserver1.ntp.org
-  - yourserver2.ntp.org
