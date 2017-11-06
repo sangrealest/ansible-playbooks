@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  strategy: free
+  name: get spcified process info
+  vars_prompt:
+    - name: "name"
+      prompt: "what is your name?"
+      private: false
+    - name: "quest"
+      prompt: "what is your quest?"
+      private: false
+    - name: "favcolor"
+      prompt: "what is your favorite color?"
+      private: false
+  tasks:
+
+  - name: health check log file name
+    debug: msg="{{ name}} quest is {{ quest }} favocolor is {{ favcolor }} "
+    tags: log

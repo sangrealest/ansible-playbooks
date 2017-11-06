@@ -1,0 +1,51 @@
+---
+- hosts: localhost
+  strategy: free
+  name: get spcified process info
+  vars_prompt:
+  - name: "process_name"
+    prompt: 'What is your process name that you want to search'
+    private: false
+    default: 'ssh'
+
+  tasks:
+  - name: clear results folder
+    shell: rm -rf /tmp/process_info.csv
+    delegate_to: localhost
+    run_once: true
+    failed_when: false
+
+  - name: get some process info
+    shell: pidof {{ process_name }}
+    register: processinfo
+    failed_when: false
+    tags: 
+    - process
+
+  - name: Show process is running
+    set_fact: 
+      process_info: "{{ process_name }} is running"
+    when: processinfo.rc == 0
+    tags: 
+    - process
+ 
+  - name: show process is NOT running 
+    set_fact: 
+      process_info: "{{ process_name }} is NOT running"
+    when: processinfo.rc != 0
+    tags: 
+    - process
+
+  - name: health check log file name
+    set_fact:
+      csv_log: "{{ ansible_hostname }}\t{{ ansible_default_ipv4.address }}\nProcess Info:\n{{ process_info }}\n"
+    tags: log
+  
+  - name:  add and update healthcheck logs
+    lineinfile:
+      line: "{{ csv_log }}"
+      dest: /tmp/process_info.csv
+      state: present
+      create: yes
+    delegate_to: localhost
+
