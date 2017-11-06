@@ -1,0 +1,22 @@
+---
+- hosts: labs
+  name: set global facts
+  tasks:
+  - name: get fact
+    stat: path=/root/test
+    register: p
+    ignore_errors: true
+
+  - name: set fact
+    set_fact:
+      masterip: "{{ inventory_hostname }}"
+    delegate_to: "{{ play_hosts[0]}}"
+#    delegate_to: "{{ inventory_hostname }}" 
+    delegate_facts: true
+    when: p.stat.exists
+
+# - hosts: labs
+#   name: use global variables
+#   tasks:
+  - name: use global variable
+    debug: msg="{{hostvars[play_hosts[0]].masterip }}"
