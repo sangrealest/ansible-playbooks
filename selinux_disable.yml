@@ -1,0 +1,23 @@
+---
+- hosts: inventory
+  tasks:
+  - shell: getenforce
+    register: seinfo
+
+  - name: disable selinux if it is enforcing
+    lineinfile: dest=/etc/selinux/config regexp=^SELINUX= line=SELINUX=disabled
+    when: seinfo.stdout == "Enforcing" or seinfo.stdout == "Permissive"
+    notify: reboot system
+
+  handlers:
+  - name: reboot system
+    shell: sync && sleep 2 && reboot
+    async: 1
+    poll: 0
+    become: true
+    ignore_errors: true
+
+    
+ 
+#   - name: using selinux module
+#     selinux: state=disabled
