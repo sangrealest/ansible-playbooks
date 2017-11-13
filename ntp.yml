@@ -1,0 +1,14 @@
+- hosts: c6
+  remote_user: root
+  gather_facts: false
+  vars:
+    ntp_server: 
+    - 11.8.13.1
+    - 11.8.13.9
+    - 11.8.13.8
+
+  tasks:
+  - name: show vars
+    debug: msg="{{ ntp_server }}"
+  - name: apply the template
+    template: src=ntp.conf.j2 dest=/etc/ntp.conf owner=root group=root mode=0644
