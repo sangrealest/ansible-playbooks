@@ -1,0 +1,9 @@
+---
+- name: Test groups vars
+  hosts: lab1
+  tasks:
+  - name: write a log file
+    copy:
+      content: "groups vars here\n"
+      dest: /tmp/groups
+    when: inventory_hostname in groups.labs
