@@ -1,0 +1,16 @@
+---
+#async not support script module
+- name : test async
+  hosts: labs
+  gather_facts: false
+  tasks:
+  - name: Test async 
+    shell: /root/sleep.sh
+    async: 9
+    poll: 0
+
+  - name: test async
+    shell: touch /tmp/after_async
+
+  - name: The last sleep 9s
+    shell: sleep 9
