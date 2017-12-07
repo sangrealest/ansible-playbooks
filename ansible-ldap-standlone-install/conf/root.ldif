@@ -1,0 +1,17 @@
+dn: uid=root,ou=People,dc=example,dc=com
+uid: root
+cn: Manager
+objectClass: account
+objectClass: posixAccount
+objectClass: top
+objectClass: shadowAccount
+userPassword: {crypt}$1$jAtMaHMb$dsaPCTmzdORKAW4C72NQH/
+shadowLastChange: 15448
+shadowMin: 0
+shadowMax: 99999
+shadowWarning: 7
+loginShell: /bin/bash
+uidNumber: 0
+gidNumber: 0
+homeDirectory: /root
+gecos: root

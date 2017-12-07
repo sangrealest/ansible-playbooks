@@ -1,0 +1,79 @@
+---
+
+- name: install openldap and httpd php
+  hosts: localhost
+  tasks:
+  - name: install softwares
+    yum: name={{ item }} state=present
+    with_items:
+    - compat-openldap
+    - openldap
+    - openldap-clients
+    - openldap-devel
+    - openldap-servers
+    - httpd
+    - php
+    - php-ldap
+    tags: ldap-install
+    notify:
+    - restart httpd
+    - restart slapd
+  
+  - name: copy conf files
+    copy: src=conf dest=/tmp/ 
+  
+  - name: copy DB_CONFIG to remote server
+    copy: src=DB_CONFIG dest=/var/lib/ldap/DB_CONFIG  
+  
+  - name: copy ldap config
+    template: src=slapd.conf.j2 dest=/etc/openldap/slapd.conf mode=0644 owner=root group=root
+  
+  - name: replace current conf files
+    shell: rm -rf /etc/openldap/slapd.d/*
+  
+  - name: start openldap
+    service: name=slapd state=started
+  
+  
+  - name: generate new conf files
+    shell: slaptest -f /etc/openldap/slapd.conf -F /etc/openldap/slapd.d/
+  #  ignore_errors: true
+  
+  - name: fix file permissions
+    file: path=/var/lib/ldap owner=ldap group=ldap recurse=yes 
+ 
+  - name: fix owner of var lib ldap
+    file: path=/etc/openldap/slapd.d mode=0755 owner=ldap group=ldap recurse=yes
+ 
+  - name: add pass
+    shell: ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/conf/configpass
+    ignore_errors: true
+ 
+  - name: config domain
+    shell: ldapadd -x -h localhost -D "cn=Manager,dc=example,dc=com" -f /tmp/conf/domain.ldif -w redhat
+   
+  - name: config groups
+    shell: ldapadd -x -h localhost -D "cn=Manager,dc=example,dc=com" -f /tmp/conf/group.ldif -w redhat
+  
+  - name: add root user
+    shell: ldapadd -x -h localhost -D "cn=Manager,dc=example,dc=com" -f /tmp/conf/root.ldif -w redhat
+  
+  - name: add user
+    shell: ldapadd -x -h localhost -D "cn=Manager,dc=example,dc=com" -f /tmp/conf/ldap-user-Jane.ldif -w redhat
+  
+  
+  - name: unarchive  phpldapadmin
+    unarchive: dest=/var/www/html/ src=phpldapadmin-1.2.3.tgz
+  
+  - name: mv config.php.example
+    shell: mv /var/www/html/phpldapadmin/config/config.php.example /var/www/html/phpldapadmin/config/config.php
+  
+    notify:
+    - restart httpd
+    - restart slapd
+ 
+  handlers:
+  - name: restart httpd
+    service: name=httpd state=restarted enabled=yes
+  - name: restart slapd
+    service: name=slapd state=restarted enabled=yes

@@ -1,0 +1,6 @@
+dn: cn=example,ou=Groups,dc=example,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: example
+gidNumber: 1500
+

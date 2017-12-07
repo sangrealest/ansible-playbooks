@@ -1,0 +1,14 @@
+dn: ou=oseusers,dc=example,dc=com
+objectClass: organizationalUnit
+ou: oseusers
+
+dn: cn=Jane,ou=oseusers,dc=example,dc=com
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Jane
+sn: Smith
+displayName: Jane Smith
+mail: jane.smith@example.com
+
+

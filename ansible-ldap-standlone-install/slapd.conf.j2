@@ -1,0 +1,26 @@
+include     /etc/openldap/schema/core.schema
+include     /etc/openldap/schema/cosine.schema
+include     /etc/openldap/schema/inetorgperson.schema
+include     /etc/openldap/schema/nis.schema
+include         /etc/openldap/schema/ppolicy.schema
+allow bind\_v2
+pidfile     /var/run/openldap/slapd.pid
+argsfile    /var/run/openldap/slapd.args
+modulepath  /usr/lib64/openldap
+moduleload  syncprov.la
+loglevel acl conns trace sync stats args
+database    bdb
+suffix      "dc=example,dc=com"
+rootdn      "cn=Manager,dc=example,dc=com"
+rootpw      redhat
+access to *
+  by * read
+directory   /var/lib/ldap
+index objectClass                       eq,pres
+index ou,cn,mail,surname,givenname      eq,pres,sub
+index uidNumber,gidNumber,loginShell    eq,pres
+index uid,memberUid                     eq,pres,sub
+index nisMapName,nisMapEntry            eq,pres,sub
+index entryCSN              eq
+index entryUUID             eq
+serverID 1
