@@ -1,0 +1,60 @@
+---
+- hosts: lab1
+  gather_facts: true
+  become: true
+  max_fail_percentage: 30
+  serial: 10
+
+  name: patch system
+  tasks:
+
+
+  - name: update system on rhel7
+    shell: uptime
+    async: 600
+    poll: 10
+    notify:
+    - reboot sequence
+
+  handlers:
+
+  - name: reboot sequence
+    changed_when: true
+    debug: msg="trigger machine reboot sequence"
+    notify:
+    - get current time
+    - reboot system
+    - wait for server to come back
+    - verify a reboot was initiated
+    
+  - name: get current time
+    command: /bin/date +%s
+    register: before_reboot
+    become: false
+
+  - name: reboot system
+    shell: sync && sleep 2 && reboot
+    async: 1
+    poll: 0
+    become: true
+    ignore_errors: true
+
+  - name: wait for server to come back
+    local_action: wait_for port=22 host={{ inventory_hostname }} search_regex=OpenSSH delay=20 timeout=300
+    become: false   
+
+# or use delegate_to module
+#  - name: wait for server to come back
+#    wait_for:
+#        host: "{{ inventory_hostname }}"
+#        port: 22
+#        state: started
+#        delay: 20
+#        timeout: 200
+#    become: False
+#    delegate_to: 127.0.0.1
+
+  - name: verify a reboot was initiated
+    shell: ((`date +%s` - `awk -F . '{print $1}' /proc/uptime` > {{ before_reboot.stdout }}))
+    become: false
+
