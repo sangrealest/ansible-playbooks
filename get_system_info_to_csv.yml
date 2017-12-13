@@ -1,6 +1,6 @@
 - hosts: labs
   gather_facts: true
-  strategy: debug
+#  strategy: debug
   tasks:
   - name: Create CSV log entry
     set_fact:
