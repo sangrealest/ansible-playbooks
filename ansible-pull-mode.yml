@@ -1,0 +1,96 @@
+ansible-pull mode
+
+ansible-pull -o -C master -d /var/projects/myrepo -U git@github.com:sangrealest/ansible-pull_examples.git [playbook]
+
+OPTIONAL ARGUMENT
+filename.yml
+
+The name of one the YAML format files to run as an ansible playbook. This can be a relative path within the checkout. 
+If not provided, ansible-pull will look for a playbook based on the host's fully-qualified domain name, 
+on the host hostname and finally a playbook named local.yml.
+
+
+cat local.yml
+---
+## Example for Ansible Pull
+## by Shanker
+
+- hosts: localhost
+  name: Ansible Example Pull Mode
+  user: root
+  connection: local
+  tasks:
+  - name: Test pull mode
+    shell: touch /tmp/ansible-pull_mode
+  
+#  roles:
+#    - bootstrap
+
+
+
+
+cat ansible-pull.j2
+ # Cron job to git clone/pull a repo and then run locally
+{{ schedule }} {{ cron_user }} ansible-pull -d {{ workdir }} -U {{ repo_url }} >>{{ logfile }} 2>&1
+
+
+
+
+cat ansible-pull_bootstrap.yml
+
+# ansible-pull setup
+#
+# on remote hosts, set up ansible to run periodically using the latest code
+# from a particular checkout, in pull based fashion, inverting Ansible's
+# usual push-based operating mode.
+#
+# This particular pull based mode is ideal for:
+#
+# (A) massive scale out
+# (B) continual system remediation
+#
+# DO NOT RUN THIS AGAINST YOUR HOSTS WITHOUT CHANGING THE repo_url
+# TO SOMETHING YOU HAVE PERSONALLY VERIFIED
+#
+#
+---
+
+- hosts: pull_mode_hosts
+  remote_user: root
+
+  vars:
+
+    # schedule is fed directly to cron
+    schedule: '*/15 * * * *'
+
+    # User to run ansible-pull as from cron
+    cron_user: root
+
+    # File that ansible will use for logs
+    logfile: /var/log/ansible-pull.log
+
+    # Directory to where repository will be cloned
+    workdir: /var/lib/ansible/local
+
+    # Repository to check out -- YOU MUST CHANGE THIS
+    # repo must contain a local.yml file at top level
+    #repo_url: git://github.com/sfromm/ansible-playbooks.git
+    repo_url: SUPPLY_YOUR_OWN_GIT_URL_HERE
+
+  tasks:
+
+    - name: Install ansible
+      yum: pkg=ansible state=installed
+
+    - name: Create local directory to work from
+      file: path={{workdir}} state=directory owner=root group=root mode=0751
+
+    - name: Copy ansible inventory file to client
+      copy: src=/etc/ansible/hosts dest=/etc/ansible/hosts
+              owner=root group=root mode=0644
+
+    - name: Create crontab entry to clone/pull git repository
+      template: src=templates/etc_cron.d_ansible-pull.j2 dest=/etc/cron.d/ansible-pull owner=root group=root mode=0644
+
+    - name: Create logrotate entry for ansible-pull.log
+      template: src=templates/etc_logrotate.d_ansible-pull.j2 dest=/etc/logrotate.d/ansible-pull owner=root group=root mode=0644
