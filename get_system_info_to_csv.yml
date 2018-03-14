@@ -1,6 +1,5 @@
 - hosts: labs
   gather_facts: true
-#  strategy: debug
   tasks:
   - name: Create CSV log entry
     set_fact:
@@ -18,8 +17,5 @@
       state: present
       create: yes
     delegate_to: localhost
-#    delegate_to: "{{ item }}"
-#    delegate_facts: true
-#    with_items: "{{ groups.labs }}"
  
 
