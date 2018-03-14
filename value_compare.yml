@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  vars:
+    - jvm: "40960"
+  tasks:
+    - name: get memory site
+      shell: echo 50000
+      register: mem
+    - set_fact:
+        cmp: "[{{ jvm | int }}, {{ mem.stdout | int }}]"
+    - debug:
+        msg: "the minimal value is {{cmp|min }}"
