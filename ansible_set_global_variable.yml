@@ -3,7 +3,8 @@
   name: set global facts
   tasks:
   - name: get fact
-    stat: path=/root/test
+    stat: 
+      path: /root/test
     register: p
     ignore_errors: true
 
