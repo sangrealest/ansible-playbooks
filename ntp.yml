@@ -1,6 +1,6 @@
 - hosts: c6
   remote_user: root
-  gather_facts: false
+  gather_facts: true
   vars:
     ntp_server: 
     - 11.8.13.1
