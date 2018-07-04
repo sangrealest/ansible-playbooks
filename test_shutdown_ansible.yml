@@ -1,0 +1,8 @@
+---
+- hosts: c74
+  tasks:
+  - name: long time task
+    shell: sleep 100 && touch /tmp/sleeped
+    async: 200
+  - name: test shutdown ansible, whether this will quit
+    shell: touch /tmp/touched
