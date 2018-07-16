@@ -1,0 +1,44 @@
+---
+- hosts: all
+  vars:
+    user: root
+
+  tasks:
+  - name: Create a random file to get public keys
+    shell: uuidgen -r
+    register: random_number
+    delegate_to: localhost
+    run_once: true
+
+  - name: Get clients pub keys to vars
+    shell: cat /root/.ssh/id_rsa.pub
+    register: public_key
+    changed_when: false
+    tags:
+      - get-pub-key
+
+  - name: Set the public keys to ansible server
+    lineinfile:
+      line: "{{ public_key.stdout }}"
+      insertafter: EOF
+      path: /tmp/public-keys-{{ random_number.stdout }}
+      create: true
+      state: present
+    delegate_to: localhost
+    tags:
+      - set-pub-key
+
+  - name: Make client ssh pub keys
+    authorized_key:
+      user: "{{ user }}"
+      state: present
+      key: "{{ lookup('file', '/tmp/public-keys-{{ random_number.stdout }}') }}"
+    tags:
+     - auth
+  - name: Delete the temp public key file
+    file: 
+      path: /tmp/public-keys-{{ random_number.stdout }}
+      state: absent
+    delegate_to: localhost
+    run_once: true
+    
