@@ -1,0 +1,16 @@
+---
+- hosts: all
+  tasks:
+  - name: Get NTP peers 
+    win_shell: w32tm /query /peers
+
+  - name: Get NTP status
+    win_shell: w32tm /query /status
+    
+#  - name: Set execute policy
+#    win_command: set-executionpolicy remotesigned
+#
+# Configure ntp servers
+#  - name: Config ntp servers
+#    win_shell: w32tm /config /computer:114.114.114.114 /update  /syncfromflags:manual
+#w32tm /config /manualpeerlist:"xx.pool.ntp.org europe.pool.ntp.org" /update /syncfromflags:manual 

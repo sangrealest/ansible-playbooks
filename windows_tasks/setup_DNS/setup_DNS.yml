@@ -1,0 +1,14 @@
+---
+- hosts: all
+  name: DNS setup
+  tasks:
+#  - name: setup DNS servers to remote hosts
+#    script: setup_DNS.ps1
+  - name: using module to setup dns
+    win_dns_client: 
+      adapter_names: "Ethernet*"
+      ipv4_addresses:
+      - 192.168.34.5
+      - 192.168.34.6
+      log_path: c:\dns_log.txt
+
