@@ -1,4 +1,4 @@
-- hosts: labs
+- hosts: all
   gather_facts: true
   tasks:
   - name: Create CSV log entry
