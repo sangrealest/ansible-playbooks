@@ -1,6 +1,6 @@
 ---
 - name: Test groups vars
-  hosts: lab1
+  hosts: localhost
   tasks:
   - name: write a log file
     copy:
