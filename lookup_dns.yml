@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  gather_facts: true
+  tasks:
+  - name: Test lookup to find the host's ip addr #especially for windows node that facts can't show the exactly ip address
+    debug:
+      msg: "{{ lookup('dig', www.baidu.com ) }}"
