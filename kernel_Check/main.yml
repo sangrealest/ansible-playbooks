@@ -7,17 +7,25 @@
     kernel_version_6: '2.6.32-642.6.2.el6.x86_64'
     kernel_version_7: '3.10.0-327.el7.x86_64'
   tasks:
+  - name: Fail the task is not redhat
+    fail:
+      msg: "This is only avaiblable for Red Hat"
+    when: ansible_distribution != "RedHat"
+
   - name: Show those machines who haven't patched to RHEL7 kernel
     failed_when: true
-    debug: msg="Host {{ansible_hostname}} {{ansible_default_ipv4.address}} hasn't been patched,it's current version is {{ ansible_kernel }}"
-    when: ansible_kernel != kernel_version_7 and ansible_distribution == "RedHat" and ansible_distribution_major_version == "7"
+    debug: 
+      msg: Host {{ansible_hostname}} {{ansible_default_ipv4.address}} hasn't been patched,it's current version is {{ ansible_kernel }}
+    when: ansible_kernel != kernel_version_7 and ansible_distribution_major_version == "7"
 
   - name: Show those machines who haven't patched to RHEL6 kernel
     failed_when: true
-    debug: msg="Host {{ansible_hostname}} {{ansible_default_ipv4.address}} hasn't been patched,it's current version is {{ ansible_kernel }}"
-    when: ansible_kernel != kernel_version_6 and ansible_distribution == "RedHat" and ansible_distribution_major_version == "6"
+    debug: 
+      msg: Host {{ansible_hostname}} {{ansible_default_ipv4.address}} hasn't been patched,it's current version is {{ ansible_kernel }}
+    when: ansible_kernel != kernel_version_6 and ansible_distribution_major_version == "6"
 
   - name: Show those machines who haven't patched to RHEL5 kernel
     failed_when: true
-    debug: msg="Host {{ansible_hostname}} {{ansible_default_ipv4.address}} hasn't been patched,it's current version is {{ ansible_kernel }}"
-    when: ansible_kernel != kernel_version_5 and ansible_distribution == "RedHat" and ansible_distribution_major_version == "5"
+    debug: 
+      msg: Host {{ansible_hostname}} {{ansible_default_ipv4.address}} hasn't been patched,it's current version is {{ ansible_kernel }}
+    when: ansible_kernel != kernel_version_5 and ansible_distribution_major_version == "5"
